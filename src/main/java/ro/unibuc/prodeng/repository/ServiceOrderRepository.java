@@ -11,4 +11,5 @@ import ro.unibuc.prodeng.model.ServiceOrderEntity;
 @Repository
 public interface ServiceOrderRepository extends MongoRepository<ServiceOrderEntity, String> {
     List<ServiceOrderEntity> findByStatus(OrderStatus status);
+    List<ServiceOrderEntity> findByMechanicIdAndStatus(String mechanicId, OrderStatus status);
 }

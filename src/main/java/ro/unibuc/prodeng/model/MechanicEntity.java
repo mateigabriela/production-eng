@@ -8,6 +8,11 @@ public record MechanicEntity(
         @Id String id,
         String firstName,
         String lastName,
-        String phone
+        String phone,
+        String workingStartTime,
+        String workingEndTime
 ) {
+        public MechanicEntity(String id, String firstName, String lastName, String phone) {
+                this(id, firstName, lastName, phone, "08:00", "17:00");
+        }
 }

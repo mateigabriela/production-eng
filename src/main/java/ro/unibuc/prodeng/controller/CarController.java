@@ -29,6 +29,11 @@ public class CarController {
         return ResponseEntity.status(HttpStatus.CREATED).body(catalogService.createCar(request));
     }
 
+    @GetMapping
+    public ResponseEntity<List<CarEntity>> getAllCars() {
+        return ResponseEntity.ok(catalogService.getAllCars());
+    }
+
     @GetMapping("/by-client/{clientId}")
     public ResponseEntity<List<CarEntity>> getCarsByClient(@PathVariable String clientId) {
         return ResponseEntity.ok(catalogService.getCarsByClientId(clientId));

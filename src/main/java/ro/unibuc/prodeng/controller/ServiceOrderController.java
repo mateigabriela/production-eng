@@ -1,6 +1,10 @@
 package ro.unibuc.prodeng.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import ro.unibuc.prodeng.model.OrderStatus;
+import ro.unibuc.prodeng.model.MechanicEntity;
 import ro.unibuc.prodeng.request.CreateServiceOrderRequest;
+import ro.unibuc.prodeng.response.ServiceOperationOptionResponse;
 import ro.unibuc.prodeng.response.ServiceOrderResponse;
 import ro.unibuc.prodeng.service.ServiceOrderService;
 
@@ -46,5 +52,28 @@ public class ServiceOrderController {
     @GetMapping
     public ResponseEntity<List<ServiceOrderResponse>> getOrdersByStatus(@RequestParam OrderStatus status) {
         return ResponseEntity.ok(serviceOrderService.getOrdersByStatus(status));
+    }
+
+    @GetMapping("/operation-catalog")
+    public ResponseEntity<List<ServiceOperationOptionResponse>> getOperationCatalog() {
+        return ResponseEntity.ok(serviceOrderService.getServiceOperationCatalog());
+    }
+
+    @GetMapping("/available-slots")
+    public ResponseEntity<List<Map<String, Object>>> getAvailableSlots(
+            @RequestParam String mechanicId,
+            @RequestParam String date,
+            @RequestParam(required = false, defaultValue = "") String operation) {
+        LocalDateTime dateStart = LocalDate.parse(date).atStartOfDay();
+        return ResponseEntity.ok(serviceOrderService.getAvailableSlots(mechanicId, dateStart, operation));
+    }
+
+    @GetMapping("/available-mechanics")
+    public ResponseEntity<List<MechanicEntity>> getAvailableMechanics(
+            @RequestParam String date,
+            @RequestParam String time,
+            @RequestParam(required = false, defaultValue = "") String operation) {
+        LocalDateTime startTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.parse(time));
+        return ResponseEntity.ok(serviceOrderService.getAvailableMechanics(startTime, operation));
     }
 }

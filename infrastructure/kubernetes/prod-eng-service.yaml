@@ -20,10 +20,11 @@ spec:
               value: local
             - name: MONGODB_CONECTION_URL
               value: mongodb://root:example@mongo:27017/
-          image: robertpoziumschi/hello-img-pipeline:v1.2.0
+          image: octavian2508/prod-eng-img:lab7-8086
+          imagePullPolicy: IfNotPresent
           name: prod-eng
           ports:
-            - containerPort: 8080
+            - containerPort: 8086
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -35,8 +36,8 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - name: "8080"
-      port: 8080
-      targetPort: 8080
+    - name: "8086"
+      port: 8086
+      targetPort: 8086
   selector:
     prod-eng-service: prod-eng

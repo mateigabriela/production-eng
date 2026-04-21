@@ -1,6 +1,7 @@
 package ro.unibuc.prodeng.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,17 +81,28 @@ public class AutoServiceCatalogService {
         return carRepository.findByClientId(clientId);
     }
 
+    public List<CarEntity> getAllCars() {
+        return carRepository.findAll();
+    }
+
     public MechanicEntity createMechanic(CreateMechanicRequest request) {
         return mechanicRepository.save(new MechanicEntity(
                 null,
                 request.firstName(),
                 request.lastName(),
-                request.phone()
+                request.phone(),
+                normalizeTimeOrDefault(request.workingStartTime(), "08:00"),
+                normalizeTimeOrDefault(request.workingEndTime(), "17:00")
         ));
     }
 
     public List<MechanicEntity> getAllMechanics() {
         return mechanicRepository.findAll();
+    }
+
+    public MechanicEntity getMechanicById(String mechanicId) {
+        return mechanicRepository.findById(mechanicId)
+                .orElseThrow(() -> new EntityNotFoundException("Mechanic " + mechanicId));
     }
 
     public SupplierEntity createSupplier(CreateSupplierRequest request) {
@@ -132,8 +144,7 @@ public class AutoServiceCatalogService {
     }
 
     public MechanicEntity ensureMechanicExists(String mechanicId) {
-        return mechanicRepository.findById(mechanicId)
-                .orElseThrow(() -> new EntityNotFoundException("Mechanic " + mechanicId));
+        return getMechanicById(mechanicId);
     }
 
     public SupplierEntity ensureSupplierExists(String supplierId) {
@@ -144,5 +155,12 @@ public class AutoServiceCatalogService {
     public PartEntity ensurePartExists(String partId) {
         return partRepository.findById(partId)
                 .orElseThrow(() -> new EntityNotFoundException("Part " + partId));
+    }
+
+    private String normalizeTimeOrDefault(String value, String defaultValue) {
+        return Optional.ofNullable(value)
+                .map(String::trim)
+                .filter(text -> !text.isBlank())
+                .orElse(defaultValue);
     }
 }

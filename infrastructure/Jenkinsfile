@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         jdk 'jdk21'
-        gradle 'gradle8'
+        gradle 'gradle-8'
     }
 
     environment {
@@ -28,19 +28,25 @@ pipeline {
         stage('Version & Tag') {
             steps {
                 script {
-                    sh 'git fetch --tag'
-                    env.MAJOR_VERSION = sh(
-                        script: 'git tag | sort -V | tail -1 | cut -d . -f 1',
+                    sh 'git fetch --tags'
+                    def latestTag = sh(
+                        script: 'git tag | sort -V | tail -1',
                         returnStdout: true
                     ).trim()
-                    env.MINOR_VERSION = sh(
-                        script: 'git tag | sort -V | tail -1 | cut -d . -f 2',
-                        returnStdout: true
-                    ).trim()
-                    env.PATCH_VERSION = sh(
-                        script: 'git tag | sort -V | tail -1 | cut -d . -f 3',
-                        returnStdout: true
-                    ).trim()
+
+                    if (!latestTag) {
+                        latestTag = '1.0.0'
+                    }
+
+                    def parts = latestTag.tokenize('.')
+                    if (parts.size() != 3) {
+                        error("Latest tag '${latestTag}' is not in MAJOR.MINOR.PATCH format")
+                    }
+
+                    env.MAJOR_VERSION = parts[0]
+                    env.MINOR_VERSION = parts[1]
+                    env.PATCH_VERSION = parts[2]
+
                     def minorInt = env.MINOR_VERSION.toInteger()
                     env.IMAGE_TAG = "${env.MAJOR_VERSION}.${minorInt + 1}.${env.PATCH_VERSION}"
                     echo "Building version: ${env.IMAGE_TAG}"
@@ -71,7 +77,7 @@ pipeline {
                         docker ps -q --filter "name=mongo" | xargs -r docker stop
                     '''
                     sh """
-                        PROD_ENG_IMAGE=${DOCKER_HUB_USERNAME}/prod-eng-img:${env.IMAGE_TAG} docker compose up -d prod-eng mongo
+                        DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME} IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d prod-eng mongo
                     """
                     sleep 30
                 }
@@ -87,7 +93,10 @@ pipeline {
         stage('Tag Release') {
             steps {
                 sh '''
-                    git tag $IMAGE_TAG
+                    git fetch --tags
+                    if ! git rev-parse "$IMAGE_TAG" >/dev/null 2>&1; then
+                      git tag $IMAGE_TAG
+                    fi
                     git push https://$GITHUB_TOKEN_PSW@github.com/FilipOctavian/prod-engineering.git $IMAGE_TAG
                 '''
             }
@@ -96,6 +105,15 @@ pipeline {
 
     post {
         always {
+            junit '**/build/test-results/**/*.xml'
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'build/reports/tests/test',
+                reportFiles: 'index.html',
+                reportName: 'Test Report'
+            ])
             sh 'docker logout'
         }
     }
