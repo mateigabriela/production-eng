@@ -114,6 +114,14 @@ pipeline {
                 reportFiles: 'index.html',
                 reportName: 'Test Report'
             ])
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'build/reports/tests/testIT',
+                reportFiles: 'index.html',
+                reportName: 'Integration Test Report'
+            ])
             sh 'docker logout'
         }
     }

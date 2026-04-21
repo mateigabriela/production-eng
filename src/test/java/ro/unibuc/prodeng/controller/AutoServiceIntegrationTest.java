@@ -1,31 +1,31 @@
 package ro.unibuc.prodeng.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ro.unibuc.prodeng.IntegrationTestBase;
 import ro.unibuc.prodeng.model.CarEntity;
 import ro.unibuc.prodeng.model.ClientEntity;
+import ro.unibuc.prodeng.model.MechanicEntity;
 import ro.unibuc.prodeng.model.OrderStatus;
 import ro.unibuc.prodeng.model.PartEntity;
 import ro.unibuc.prodeng.model.ServiceOrderEntity;
 import ro.unibuc.prodeng.model.SupplierEntity;
-import ro.unibuc.prodeng.model.MechanicEntity;
 import ro.unibuc.prodeng.repository.CarRepository;
 import ro.unibuc.prodeng.repository.ClientRepository;
 import ro.unibuc.prodeng.repository.MechanicRepository;
@@ -76,6 +76,7 @@ class AutoServiceIntegrationTest extends IntegrationTestBase {
 
         String createOrderPayload = """
                 {
+                                                                        "clientId": "client-1",
                   "carId": "car-1",
                   "mechanicId": "mechanic-1",
                   "serviceName": "Revizie completa",
@@ -144,6 +145,7 @@ class AutoServiceIntegrationTest extends IntegrationTestBase {
 
         String createOrderPayload = """
                 {
+                                                                        "clientId": "client-1",
                   "carId": "car-1",
                   "mechanicId": "mechanic-1",
                   "serviceName": "Revizie completa",
@@ -309,6 +311,7 @@ class AutoServiceIntegrationTest extends IntegrationTestBase {
 
         String createOrderPayload = """
                 {
+                                                                        "clientId": "client-1",
                   "carId": "car-1",
                   "mechanicId": "mechanic-1",
                   "serviceName": "Revizie completa",

@@ -61,6 +61,10 @@ test {
 	useJUnitPlatform {
 		excludeTags ("IntegrationTest", "E2E")
 	}
+	reports {
+		junitXml.required = true
+		html.required = true
+	}
 	finalizedBy jacocoTestReport
 }
 
@@ -95,6 +99,10 @@ task testIT(type: Test) {
 
 	useJUnitPlatform {
 		includeTags "IntegrationTest"
+	}
+	reports {
+		junitXml.required = true
+		html.required = true
 	}
 }
 
