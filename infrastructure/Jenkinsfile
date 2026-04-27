@@ -86,7 +86,7 @@ pipeline {
 
         stage('Integration Tests') {
             steps {
-                sh './gradlew testIT'
+                sh 'TESTCONTAINERS_RYUK_DISABLED=true TESTCONTAINERS_CHECKS_DISABLE=true ./gradlew testIT'
             }
         }
 
