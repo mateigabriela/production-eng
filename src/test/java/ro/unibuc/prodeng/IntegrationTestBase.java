@@ -35,4 +35,4 @@ static void setProperties(DynamicPropertyRegistry registry) {
         String mongoUrl = "mongodb://localhost:" + mongoDBContainer.getMappedPort(27017);
         registry.add("mongodb.connection.url", () -> mongoUrl);
     }
-}
+} }
