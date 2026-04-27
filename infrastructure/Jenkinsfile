@@ -101,7 +101,7 @@ pipeline {
                         if ! git rev-parse "$IMAGE_TAG" >/dev/null 2>&1; then
                           git tag $IMAGE_TAG
                         fi
-                        git push https://$GITHUB_USER:$GITHUB_TOKEN@github.com/mateigabriela/production-eng.git $IMAGE_TAG
+                        git push https://$GITHUB_USER:$GITHUB_TOKEN@github.com/mateigabriela/production-eng.git $IMAGE_TAG || true
                     '''
                 }
             }
