@@ -22,7 +22,7 @@ pipeline {
         stage('Version & Tag') {
             steps {
                 script {
-                    sh 'git fetch --tags'
+                    sh 'git fetch --tags --force'
                     def latestTag = sh(
                         script: 'git tag | sort -V | tail -1',
                         returnStdout: true
