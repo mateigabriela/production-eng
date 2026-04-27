@@ -8,8 +8,6 @@ pipeline {
 
     environment {
         DOCKER_HUB_USERNAME = 'octavian2508'
-        DOCKER_PASSWORD = credentials('docker_password')
-        GITHUB_TOKEN = credentials('github_token')
     }
 
     stages {
@@ -62,10 +60,12 @@ pipeline {
 
         stage('Push to Docker Hub') {
             steps {
-                sh '''
-                    echo $DOCKER_PASSWORD_PSW | docker login -u $DOCKER_HUB_USERNAME --password-stdin
-                    docker push $DOCKER_HUB_USERNAME/prod-eng-img:$IMAGE_TAG
-                '''
+                withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $DOCKER_HUB_USERNAME/prod-eng-img:$IMAGE_TAG
+                    '''
+                }
             }
         }
 
@@ -92,37 +92,41 @@ pipeline {
 
         stage('Tag Release') {
             steps {
-                sh '''
-                    git fetch --tags
-                    if ! git rev-parse "$IMAGE_TAG" >/dev/null 2>&1; then
-                      git tag $IMAGE_TAG
-                    fi
-                    git push https://$GITHUB_TOKEN_PSW@github.com/mateigabriela/production-eng.git $IMAGE_TAG
-                '''
+                withCredentials([usernamePassword(credentialsId: 'github_token', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git fetch --tags
+                        if ! git rev-parse "$IMAGE_TAG" >/dev/null 2>&1; then
+                          git tag $IMAGE_TAG
+                        fi
+                        git push https://$GITHUB_USER:$GITHUB_TOKEN@github.com/mateigabriela/production-eng.git $IMAGE_TAG
+                    '''
+                }
             }
         }
     }
 
     post {
         always {
-            junit '**/build/test-results/**/*.xml'
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: false,
-                keepAll: true,
-                reportDir: 'build/reports/tests/test',
-                reportFiles: 'index.html',
-                reportName: 'Test Report'
-            ])
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: false,
-                keepAll: true,
-                reportDir: 'build/reports/tests/testIT',
-                reportFiles: 'index.html',
-                reportName: 'Integration Test Report'
-            ])
-            sh 'docker logout'
+            node {
+                junit '**/build/test-results/**/*.xml'
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: 'build/reports/tests/test',
+                    reportFiles: 'index.html',
+                    reportName: 'Test Report'
+                ])
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: 'build/reports/tests/testIT',
+                    reportFiles: 'index.html',
+                    reportName: 'Integration Test Report'
+                ])
+                sh 'docker logout || true'
+            }
         }
     }
 }
