@@ -72,8 +72,14 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     script {
                         sh '''
-                            docker rm -f $(docker ps -aq --filter "name=prod-eng") || true
-                            docker rm -f $(docker ps -aq --filter "name=mongo") || true
+                            docker compose down --remove-orphans || true
+
+                            for port in 5005 27017; do
+                                while [ -n "$(docker ps -q --filter \"publish=${port}\")" ]; do
+                                    docker ps -q --filter "publish=${port}" | xargs -r docker rm -f || true
+                                    sleep 2
+                                done
+                            done
                         '''
                         sh """
                             DOCKER_HUB_USERNAME=${DOCKER_USER} IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d prod-eng mongo
