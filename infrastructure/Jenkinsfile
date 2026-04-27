@@ -107,26 +107,24 @@ pipeline {
 
     post {
         always {
-            node {
-                junit '**/build/test-results/**/*.xml'
-                publishHTML([
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: false,
-                    keepAll: true,
-                    reportDir: 'build/reports/tests/test',
-                    reportFiles: 'index.html',
-                    reportName: 'Test Report'
-                ])
-                publishHTML([
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: false,
-                    keepAll: true,
-                    reportDir: 'build/reports/tests/testIT',
-                    reportFiles: 'index.html',
-                    reportName: 'Integration Test Report'
-                ])
-                sh 'docker logout || true'
-            }
+            junit '**/build/test-results/**/*.xml'
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'build/reports/tests/test',
+                reportFiles: 'index.html',
+                reportName: 'Test Report'
+            ])
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'build/reports/tests/testIT',
+                reportFiles: 'index.html',
+                reportName: 'Integration Test Report'
+            ])
+            sh 'docker logout || true'
         }
     }
 }
