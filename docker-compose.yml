@@ -1,6 +1,6 @@
 services:
   prod-eng:
-    image: ${DOCKER_HUB_USERNAME:-octavian2508}/prod-eng-img:${IMAGE_TAG:-latest}
+    image: ${PROD_ENG_IMAGE:-prod-eng-img}
     ports:
       - 8086:8086
       - 5005:5005

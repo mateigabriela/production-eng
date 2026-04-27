@@ -24,16 +24,15 @@ public abstract class IntegrationTestBase {
                     .withLabel("ro.unibuc.prodeng", "integration-test-mongo");
 
     static {
-        if (System.getenv("MONGODB_CONECTION_URL") == null) {
-            mongoDBContainer.start();
-        }
+    if (System.getenv("MONGODB_CONECTION_URL") == null) {
+        mongoDBContainer.start();
     }
+}
 
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry registry) {
-        if (mongoDBContainer.isRunning()) {
-            String mongoUrl = "mongodb://localhost:" + mongoDBContainer.getMappedPort(27017);
-            registry.add("mongodb.connection.url", () -> mongoUrl);
-        }
+@DynamicPropertySource
+static void setProperties(DynamicPropertyRegistry registry) {
+    if (mongoDBContainer.isRunning()) {
+        String mongoUrl = "mongodb://localhost:" + mongoDBContainer.getMappedPort(27017);
+        registry.add("mongodb.connection.url", () -> mongoUrl);
     }
 }
