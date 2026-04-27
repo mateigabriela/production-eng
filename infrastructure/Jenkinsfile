@@ -22,7 +22,7 @@ pipeline {
         stage('Version & Tag') {
             steps {
                 script {
-                    sh 'git fetch --tags --force'
+                    sh 'git fetch --tags'
                     def latestTag = sh(
                         script: 'git tag | sort -V | tail -1',
                         returnStdout: true
@@ -72,8 +72,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     script {
                         sh '''
-                            docker ps -q --filter "name=prod-eng" | xargs -r docker stop
-                            docker ps -q --filter "name=mongo" | xargs -r docker stop
+                            docker rm -f $(docker ps -aq --filter "name=prod-eng") || true
+                            docker rm -f $(docker ps -aq --filter "name=mongo") || true
                         '''
                         sh """
                             DOCKER_HUB_USERNAME=${DOCKER_USER} IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d prod-eng mongo
