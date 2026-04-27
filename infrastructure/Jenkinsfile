@@ -6,10 +6,6 @@ pipeline {
         gradle 'gradle-8'
     }
 
-    environment {
-        DOCKER_HUB_USERNAME = 'octavian2508'
-    }
-
     stages {
         stage('Build') {
             steps {
@@ -54,7 +50,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_HUB_USERNAME/prod-eng-img:$IMAGE_TAG .'
+                withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'docker build -t $DOCKER_USER/prod-eng-img:$IMAGE_TAG .'
+                }
             }
         }
 
@@ -63,7 +61,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker push $DOCKER_HUB_USERNAME/prod-eng-img:$IMAGE_TAG
+                        docker push $DOCKER_USER/prod-eng-img:$IMAGE_TAG
                     '''
                 }
             }
@@ -71,15 +69,17 @@ pipeline {
 
         stage('Deploy Application') {
             steps {
-                script {
-                    sh '''
-                        docker ps -q --filter "name=prod-eng" | xargs -r docker stop
-                        docker ps -q --filter "name=mongo" | xargs -r docker stop
-                    '''
-                    sh """
-                        DOCKER_HUB_USERNAME=${DOCKER_HUB_USERNAME} IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d prod-eng mongo
-                    """
-                    sleep 30
+                withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    script {
+                        sh '''
+                            docker ps -q --filter "name=prod-eng" | xargs -r docker stop
+                            docker ps -q --filter "name=mongo" | xargs -r docker stop
+                        '''
+                        sh """
+                            DOCKER_HUB_USERNAME=${DOCKER_USER} IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d prod-eng mongo
+                        """
+                        sleep 30
+                    }
                 }
             }
         }
@@ -116,14 +116,18 @@ pipeline {
                 reportFiles: 'index.html',
                 reportName: 'Test Report'
             ])
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: false,
-                keepAll: true,
-                reportDir: 'build/reports/tests/testIT',
-                reportFiles: 'index.html',
-                reportName: 'Integration Test Report'
-            ])
+            script {
+                if (fileExists('build/reports/tests/testIT/index.html')) {
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'build/reports/tests/testIT',
+                        reportFiles: 'index.html',
+                        reportName: 'Integration Test Report'
+                    ])
+                }
+            }
             sh 'docker logout || true'
         }
     }
