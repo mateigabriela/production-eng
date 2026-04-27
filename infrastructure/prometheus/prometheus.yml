@@ -21,9 +21,12 @@ scrape_configs:
   - job_name: 'spring-prod-eng-app'
     metrics_path: '/actuator/prometheus'
     static_configs:
-          - targets: ['prod-eng:8086']
-  - canary-alerts.yml
-  - container-alerts.yml
+      - targets: ['prod-eng:8086']
+
+rule_files:
+  - 'app-alerts.yml'
+  - 'canary-alerts.yml'
+  - 'container-alerts.yml'
 
 alerting:
   alertmanagers:
