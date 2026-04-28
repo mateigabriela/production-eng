@@ -17,6 +17,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MetricsService metricsService;
+
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::toResponse)
@@ -24,9 +27,11 @@ public class UserService {
     }
 
     public UserResponse getUserById(String id) throws EntityNotFoundException {
-        UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(id));
-        return toResponse(user);
+        return metricsService.getUserLookupTimer().record(() -> {
+            UserEntity user = userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException(id));
+            return toResponse(user);
+        });
     }
 
     public UserEntity getUserEntityById(String id) throws EntityNotFoundException {
@@ -44,6 +49,7 @@ public class UserService {
                 request.email()
         );
         UserEntity saved = userRepository.save(user);
+        metricsService.recordUserCreated();
         return toResponse(saved);
     }
 

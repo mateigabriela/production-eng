@@ -1,5 +1,6 @@
 package ro.unibuc.prodeng.service;
 
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import ro.unibuc.prodeng.exception.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,8 +30,19 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private MetricsService metricsService;
+
     @InjectMocks
     private UserService userService;
+
+    @BeforeEach
+    void setUp() {
+        Timer mockTimer = mock(Timer.class);
+        when(metricsService.getUserLookupTimer()).thenReturn(mockTimer);
+        doAnswer(inv -> ((Supplier<?>) inv.getArgument(0)).get())
+                .when(mockTimer).record(any(Supplier.class));
+    }
 
     @Test
     void testGetAllUsers_withMultipleUsers_returnsAllUsers() {
