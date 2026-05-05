@@ -1,0 +1,86 @@
+groups:
+  - name: CustomAlerts
+    rules:
+      # ============= AVAILABILITY ALERTS =============
+      - alert: WARNING-ServiceHealthCheckFailing
+        expr: up{job="spring-prod-eng-app"} == 0
+        for: 30s
+        labels:
+          severity: warning
+          category: availability
+        annotations:
+          summary: "Service health check failing (instance {{ $labels.instance }})"
+          description: "The spring-prod-eng-app target has been unreachable for more than 30 seconds.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      - alert: CRITICAL-ServiceDown
+        expr: up{job="spring-prod-eng-app"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Service DOWN (instance {{ $labels.instance }})"
+          description: "The spring-prod-eng-app has been unreachable for more than 2 minutes. CRITICAL - immediate action required!\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      # ============= PERFORMANCE ALERTS =============
+      - alert: WARNING-HighRequestLatency
+        expr: (sum(rate(http_server_requests_seconds_sum{uri!~"/actuator.*"}[5m])) by (uri) / sum(rate(http_server_requests_seconds_count{uri!~"/actuator.*"}[5m])) by (uri)) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High average request latency on {{ $labels.uri }}"
+          description: "Average request latency exceeds 500ms over the last 5 minutes.\n  VALUE = {{ $value }}s\n  LABELS = {{ $labels }}"
+
+      - alert: CRITICAL-VeryHighRequestLatency
+        expr: (sum(rate(http_server_requests_seconds_sum{uri!~"/actuator.*"}[5m])) by (uri) / sum(rate(http_server_requests_seconds_count{uri!~"/actuator.*"}[5m])) by (uri)) > 2.0
+        for: 1m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "CRITICAL: Extremely high latency on {{ $labels.uri }}"
+          description: "Average request latency exceeds 2 seconds! Users are experiencing severe slowness.\n  VALUE = {{ $value }}s\n  LABELS = {{ $labels }}"
+
+      # ============= QUALITY ALERTS =============
+      - alert: WARNING-HighErrorRate
+        expr: (sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) by (uri) / sum(rate(http_server_requests_seconds_count{uri!~"/actuator.*"}[5m])) by (uri)) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+          category: quality
+        annotations:
+          summary: "High error rate detected on {{ $labels.uri }} ({{ $value | humanizePercentage }})"
+          description: "More than 5% of requests are returning 5xx errors over the last 5 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      - alert: CRITICAL-VeryHighErrorRate
+        expr: (sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) by (uri) / sum(rate(http_server_requests_seconds_count{uri!~"/actuator.*"}[5m])) by (uri)) > 0.2
+        for: 1m
+        labels:
+          severity: critical
+          category: quality
+        annotations:
+          summary: "CRITICAL: Error rate exceeds 20% on {{ $labels.uri }}"
+          description: "More than 20% of requests are returning 5xx errors! System is severely degraded.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      # ============= CUSTOM METRICS ALERTS =============
+      - alert: WARNING-HighUserCreationRate
+        expr: rate(app_users_total[5m]) > 0.5
+        for: 1m
+        labels:
+          severity: warning
+          category: quality
+        annotations:
+          summary: "High user creation rate detected"
+          description: "User creation rate exceeds 0.5 users/sec over 5 minutes.\n  VALUE = {{ $value }}/sec\n  LABELS = {{ $labels }}"
+
+      - alert: WARNING-NoActiveServiceOrders
+        expr: app_service_orders_active == 0
+        for: 5m
+        labels:
+          severity: info
+          category: quality
+        annotations:
+          summary: "No active service orders"
+          description: "There have been no active service orders for more than 5 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

@@ -16,6 +16,24 @@
         },
         "type": "dashboard"
       }
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "enable": true,
+          "hide": false,
+          "iconColor": "rgba(255, 0, 0, 1)",
+          "name": "Prometheus Alerts",
+          "step": "60s",
+          "target": {
+            "expr": "ALERTS{severity=~\"warning|critical\"}",
+            "format": "table",
+            "instant": false,
+            "refId": "A"
+          },
+          "type": "prometheus"
+        }
     ]
   },
   "editable": true,
