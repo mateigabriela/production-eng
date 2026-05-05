@@ -33,21 +33,22 @@ inhibit_rules:
     equal: ['category']
   
 receivers:
+- name: 'email'
   email_configs:
-  - to: 'EMAIL@gmail.com'
-    from: 'EMAIL@gmail.com'
+  - to: 'mateigabriela202@gmail.com'
+    from: 'mateigabriela202@gmail.com'
     smarthost: smtp.gmail.com:587
-    auth_username: 'EMAIL@gmail.com'
-    auth_identity: 'EMAIL@gmail.com'
+    auth_username: 'mateigabriela202@gmail.com'
+    auth_identity: 'mateigabriela202@gmail.com'
     auth_password: 'GENERATE ONE FROM https://security.google.com/settings/security/apppasswords'
     
 - name: 'critical-email'
   email_configs:
-  - to: 'YOUR_EMAIL@gmail.com'
+  - to: 'mateigabriela202@gmail.com'
     from: 'alerts@prod-eng.local'
     smarthost: smtp.gmail.com:587
-    auth_username: 'YOUR_EMAIL@gmail.com'
-    auth_identity: 'YOUR_EMAIL@gmail.com'
+    auth_username: 'mateigabriela202@gmail.com'
+    auth_identity: 'mateigabriela202@gmail.com'
     auth_password: 'YOUR_APP_PASSWORD_HERE'
     headers:
       Subject: '[🚨 CRITICAL] {{ .GroupLabels.alertname }}'
@@ -64,11 +65,11 @@ receivers:
 
 - name: 'warning-email'
   email_configs:
-  - to: 'YOUR_EMAIL@gmail.com'
+  - to: 'mateigabriela202@gmail.com'
     from: 'alerts@prod-eng.local'
     smarthost: smtp.gmail.com:587
-    auth_username: 'YOUR_EMAIL@gmail.com'
-    auth_identity: 'YOUR_EMAIL@gmail.com'
+    auth_username: 'mateigabriela202@gmail.com'
+    auth_identity: 'mateigabriela202@gmail.com'
     auth_password: 'YOUR_APP_PASSWORD_HERE'
     headers:
       Subject: '[⚠️  WARNING] {{ .GroupLabels.alertname }}'
@@ -85,11 +86,11 @@ receivers:
 
 - name: 'info-email'
   email_configs:
-  - to: 'YOUR_EMAIL@gmail.com'
+  - to: 'mateigabriela202@gmail.com'
     from: 'alerts@prod-eng.local'
     smarthost: smtp.gmail.com:587
-    auth_username: 'YOUR_EMAIL@gmail.com'
-    auth_identity: 'YOUR_EMAIL@gmail.com'
+    auth_username: 'mateigabriela202@gmail.com'
+    auth_identity: 'mateigabriela202@gmail.com'
     auth_password: 'YOUR_APP_PASSWORD_HERE'
     headers:
       Subject: '[ℹ️  INFO] {{ .GroupLabels.alertname }}'
