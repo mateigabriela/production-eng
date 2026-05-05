@@ -36,20 +36,22 @@ receivers:
 - name: 'email'
   email_configs:
   - to: 'mateigabriela202@gmail.com'
-    from: 'mateigabriela202@gmail.com'
-    smarthost: smtp.gmail.com:587
-    auth_username: 'mateigabriela202@gmail.com'
-    auth_identity: 'mateigabriela202@gmail.com'
-    auth_password: 'aycm seqt qcqr zjoq'
+    from: 'john.doe@example.org'
+    smarthost: app.debugmail.io:25
+    auth_username: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_identity: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_password: '793b3c92-c3dd-4e41-a010-12c1a217f560'
+    require_tls: false
     
 - name: 'critical-email'
   email_configs:
   - to: 'mateigabriela202@gmail.com'
-    from: 'alerts@prod-eng.local'
-    smarthost: smtp.gmail.com:587
-    auth_username: 'mateigabriela202@gmail.com'
-    auth_identity: 'mateigabriela202@gmail.com'
-    auth_password: 'aycm seqt qcqr zjoq'
+    from: 'john.doe@example.org'
+    smarthost: app.debugmail.io:25
+    auth_username: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_identity: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_password: '793b3c92-c3dd-4e41-a010-12c1a217f560'
+    require_tls: false
     headers:
       Subject: '[🚨 CRITICAL] {{ .GroupLabels.alertname }}'
     html: |
@@ -66,11 +68,12 @@ receivers:
 - name: 'warning-email'
   email_configs:
   - to: 'mateigabriela202@gmail.com'
-    from: 'alerts@prod-eng.local'
-    smarthost: smtp.gmail.com:587
-    auth_username: 'mateigabriela202@gmail.com'
-    auth_identity: 'mateigabriela202@gmail.com'
-    auth_password: 'aycm seqt qcqr zjoq'
+    from: 'john.doe@example.org'
+    smarthost: app.debugmail.io:25
+    auth_username: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_identity: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_password: '793b3c92-c3dd-4e41-a010-12c1a217f560'
+    require_tls: false
     headers:
       Subject: '[⚠️  WARNING] {{ .GroupLabels.alertname }}'
     html: |
@@ -87,10 +90,11 @@ receivers:
 - name: 'info-email'
   email_configs:
   - to: 'mateigabriela202@gmail.com'
-    from: 'alerts@prod-eng.local'
-    smarthost: smtp.gmail.com:587
-    auth_username: 'mateigabriela202@gmail.com'
-    auth_identity: 'mateigabriela202@gmail.com'
-    auth_password: 'YOUR_APP_PASSWORD_HERE'
+    from: 'john.doe@example.org'
+    smarthost: app.debugmail.io:25
+    auth_username: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_identity: 'd74ae2d8-db53-4bef-bbd2-07ffad74addf'
+    auth_password: '793b3c92-c3dd-4e41-a010-12c1a217f560'
+    require_tls: false
     headers:
       Subject: '[ℹ️  INFO] {{ .GroupLabels.alertname }}'
