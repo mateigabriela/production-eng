@@ -15,9 +15,9 @@
           "type": "dashboard"
         },
         "type": "dashboard"
-      }
-        {
-          "datasource": {
+      },
+      {
+        "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
@@ -119,7 +119,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "rate(prod_eng_api_users_count_total[5m])",
+          "expr": "rate(http_requests_total[5m])",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -204,7 +204,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "prod_eng_api_users_count_total",
+          "expr": "http_requests_total",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -289,7 +289,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "prod_eng_api_users_time_seconds_max",
+          "expr": "http_server_requests_seconds_max",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -374,7 +374,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "rate(prod_eng_info_count_total[5m])",
+          "expr": "rate(http_server_requests_seconds_count[5m])",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -459,7 +459,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "prod_eng_info_count_total",
+          "expr": "http_server_requests_seconds_count",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -544,7 +544,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "prod_eng_info_time_seconds_max",
+          "expr": "http_server_requests_seconds_max",
           "interval": "",
           "legendFormat": "",
           "refId": "A"

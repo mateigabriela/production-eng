@@ -1,0 +1,243 @@
+{
+  "dashboard": {
+    "title": "Prod-Eng Monitoring Dashboard",
+    "description": "Lab 5.5 - Monitoring with Instance Variables",
+    "tags": ["prod-eng", "lab5.5", "monitoring"],
+    "timezone": "browser",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "schemaVersion": 40,
+    "version": 1,
+    "templating": {
+      "list": [
+        {
+          "name": "instance",
+          "label": "Instance",
+          "description": "Select instance to filter metrics",
+          "type": "query",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "definition": "label_values(up, instance)",
+          "query": "label_values(up, instance)",
+          "current": {
+            "text": "prod-eng:8086",
+            "value": "prod-eng:8086"
+          },
+          "multi": false,
+          "includeAll": true,
+          "allValue": ".*",
+          "refresh": 1,
+          "sort": 1
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate by Endpoint",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "expr": "sum(rate(http_server_requests_seconds_count{instance=~\"$instance\"}[5m])) by (uri)",
+            "format": "timeseries",
+            "legendFormat": "{{uri}}",
+            "interval": ""
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "lineInterpolation": "linear"
+            },
+            "unit": "reqps"
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "calcs": []
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "P95 Latency (histogram_quantile)",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{instance=~\"$instance\"}[5m])) by (le, uri))",
+            "format": "timeseries",
+            "legendFormat": "p95 {{uri}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "lineInterpolation": "linear"
+            },
+            "unit": "s"
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "calcs": []
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Error Rate (%)",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 12,
+          "h": 8
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "expr": "(sum(rate(http_server_requests_seconds_count{instance=~\"$instance\",status=~\"5..\"}[5m])) or vector(0)) / sum(rate(http_server_requests_seconds_count{instance=~\"$instance\"}[5m])) * 100",
+            "format": "timeseries",
+            "legendFormat": "Error Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "lineInterpolation": "linear"
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom",
+            "calcs": []
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Custom Metrics Summary",
+        "type": "stat",
+        "gridPos": {
+          "x": 12,
+          "y": 8,
+          "w": 12,
+          "h": 8
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "expr": "sum(app_users_created_total)",
+            "format": "timeseries",
+            "legendFormat": "Users Created"
+          },
+          {
+            "refId": "B",
+            "expr": "sum(app_errors_total)",
+            "format": "timeseries",
+            "legendFormat": "Total Errors"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"]
+          }
+        }
+      }
+    ]
+  },
+  "overwrite": true,
+  "message": "Lab 5.5: Dashboard with Variables"
+}

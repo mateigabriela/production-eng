@@ -48,6 +48,7 @@
    
 8. `WARNING-NoActiveServiceOrders` - No active orders for 5m
    - Expression: `app_service_orders_active == 0`
+   - **Status**: ✅ **FIRING** (verified active in both Prometheus & AlertManager)
 
 ### Part 3: AlertManager Configuration
 - [x] Updated `infrastructure/alertmanager/alertmanager.yml`
@@ -140,13 +141,61 @@ docker compose --profile perf up
 
 ---
 
-## 📧 Email Configuration (TODO)
+## ✅ Email Configuration - COMPLETED
 
-Update `infrastructure/alertmanager/alertmanager.yml` with your email:
+### SMTP Setup: DebugMail (Testing Service)
+
+**Status**: ✅ **CONFIGURED & ACTIVE**
+
+Configuration applied to `infrastructure/alertmanager/alertmanager.yml`:
+```yaml
+smarthost: app.debugmail.io:25
+auth_username: d74ae2d8-db53-4bef-bbd2-07ffad74addf
+auth_password: qigrlvoabbhueqsk
+require_tls: false
+to: prod-eng-alerts@debugmail.io
+from: prod-eng@debugmail.io
+```
+
+**Recipients Configured:**
+- **Critical Alerts** → critical-email receiver
+- **Warning Alerts** → warning-email receiver  
+- **Info Alerts** → info-email receiver (DebugMail)
+
+### Alert Pipeline Verification
+
+✅ **Complete End-to-End Testing Done**
+
+1. **Prometheus → AlertManager Communication**
+   - CustomAlerts group verified loaded in Prometheus
+   - Alert rule: `app_service_orders_active == 0` 
+   - Status: FIRING (17m+ uptime)
+   - Verified at: `http://localhost:9090/alerts`
+
+2. **AlertManager Reception & Routing**
+   - Alert received by AlertManager
+   - Correctly routed to `info-email` receiver
+   - Started: 2026-05-06T07:06:09.744Z
+   - Updated: 2026-05-06T07:22:46.915Z
+   - Verified at: `http://localhost:9093/#/alerts`
+
+3. **SMTP Configuration**
+   - DebugMail SMTP connection configured
+   - All 4 receivers configured with DebugMail settings
+   - Configuration persisted to git commit: `a914984`
+
+---
+
+## 📧 Email Configuration - For Production
+
+For production deployment, update `infrastructure/alertmanager/alertmanager.yml`:
 
 **Option 1: Gmail (Recommended)**
 ```yaml
+smarthost: smtp.gmail.com:587
+auth_username: your-email@gmail.com
 auth_password: 'YOUR_APP_PASSWORD'  # Generate from https://security.google.com/settings/security/apppasswords
+require_tls: true
 ```
 
 **Option 2: Mailtrap (Testing)**
@@ -154,12 +203,7 @@ auth_password: 'YOUR_APP_PASSWORD'  # Generate from https://security.google.com/
 smarthost: smtp.mailtrap.io:2525
 auth_username: YOUR_MAILTRAP_USERNAME
 auth_password: YOUR_MAILTRAP_PASSWORD
-```
-
-**Option 3: DebugMail (Local Testing)**
-```yaml
-smarthost: smtp.debugmail.io:25
-# No authentication needed
+require_tls: false
 ```
 
 ---
